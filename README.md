@@ -120,3 +120,47 @@ In this project I will implement a solution that consists of following component
 
 > For Web Servers it look like a local file system from where they can serve the same files.
 
+
+## Implementing a business website using NFS for the backend file storage
+
+### Step 1 - Prepare NFS Server
+
+> 1. Spin up a new EC2 instance with RHEL Linux 8 Operating System.
+
+> 2. Based on your LVM experience from Project 6, Configure LVM on the Server.
+
+• Instead of formating the disks as ext4 you will have to format them as xfs
+• Ensure there are 3 Logical Volumes. 1v-opt lv-apps, and lv-logs
+
+> 3. Create mount points on /mnt directory for the logical volumes as follow: Mount lv-apps on /mnt/apps
+
+- To be used by webservers Mount lv-logs on /mnt/logs - To be used by webserver logs Mount Iv-opt on /mnt/opt - To be used by Jenkins server in Project 8
+
+> 4. Install NFS server, configure it to start on reboot and make sure it is u and running.
+
+```
+sudo yum -y update
+```
+```
+sudo yum install nfs-utils -y
+```
+```
+sudo systemctl start nfs-server.service
+```
+```
+sudo systemctl enable nfs-server.service
+```
+```
+sudo systemctl status nfs-server.service
+```
+
+
+> 5. Export the mounts for webservers' subnet cidr to connect as clients. 
+
+For simplicity, I will install your all three Web Servers inside the same subnet, but in production set up you would probably want to separate each tier inside its own subnet for higher level of security. 
+
+To check your subnet cidr - open your EC2 details in AWS web console and locate 'Networking' tab and open a Subnet link:
+
+
+
+
