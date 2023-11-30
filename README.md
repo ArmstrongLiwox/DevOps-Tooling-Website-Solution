@@ -271,6 +271,8 @@ sudo chmod -R 777 /mnt/opt
 ```
 sudo systemctl restart nfs-server.service
 ```
+![permissions](images/permissions.jpg)
+
 
 > Configure access to NFS for clients within the same subnet (example of Subnet CIDR 172.31.32.0/20 ):
 
@@ -282,20 +284,34 @@ sudo vi /etc/exports
 /mnt/logs <Subnet-CIDR>(rw,sync,no_all_squash,no_root_squash)
 /mnt/opt <Subnet-CIDR>(rw,sync,no_all_squash,no_root_squash)
 ```
+
+```
+/mnt/apps 172.31.16.0/20(rw,sync,no_all_squash,no_root_squash)
+/mnt/logs 172.31.16.0/20(rw,sync,no_all_squash,no_root_squash)
+/mnt/opt 172.31.16.0/20(rw,sync,no_all_squash,no_root_squash)
+```
+
 ```
 Esc + :wq!
 ```
+![edit export](<images/edit export.jpg>)
+
 ```
 sudo exportfs -arv
 ```
+![exports](images/exports.jpg)
 
 > 6. Check which port is used by NFS and open it using Security Groups (add new Inbound Rule)
 
 ```
 rpcinfo -p | grep nfs
 ```
+![nfs ports](<images/nfs ports.jpg>)
+
 
 Important note: In order for NFS server to be accessible from your client, you must also open following ports: TCP 111, UDP 111, UDP 2049
+
+![ports open](images/ports.jpg)
 
 ## Configure backend database as part of 3 tier architecture
 
@@ -358,11 +374,17 @@ During the next steps we will do following:
 
 ### 1. Launch a new EC2 instance with RHEL 8 Operating System
 
+![launch web1](<images/webserver1 launch.jpg>)
+
+![webserver1](images/webserver1.jpg)
+
+
 ### 2. Install NFS client
 
 ```
 sudo yum install nfs-utils nfs4-acl-tools -y
 ```
+![nfs on web1](<images/nfs web1.jpg>)
 
 ### 3. Mount /var/www/ and target the NFS server's export for apps
 
@@ -372,6 +394,7 @@ sudo mkdir /var/www
 ```
 sudo mount -t nfs -o rw,nosuid <NFS-Server-Private-IP-Address>:/mnt/apps /var/www
 ```
+![mount web1](<images/mount web1.jpg>)
 
 ### 4. Verify that NFS was mounted successfully by running of -h . Make sure that the changes will persist on Web Server after reboot:
 
@@ -384,12 +407,18 @@ add following line
 ```
 <NFS-Server-Private-IP-Address>:/mnt/apps /var/www nfs defaults 0 0
 ```
+```
+172.31.16.77:/mnt/apps /var/www nfs defaults 0 0
+```
+![fstab](images/fstab.jpg)
 
 ### 5. Install *Remi's repository*, Apache and PHP
 
 ```
 sudo yum install httpd -y
 ```
+![httpd](images/httpd.jpg)
+
 ```
 sudo dnf install https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 ```
@@ -414,6 +443,7 @@ sudo systemctl enable php-fpm
 ```
 setsebool -P httpd_execmem 1
 ```
+![installed httpd](<images/httpd installed.jpg>)
 
 ## ***Repeat steps 1-5 for another 2 Web Servers***.
 
@@ -421,21 +451,90 @@ setsebool -P httpd_execmem 1
 
 If you see the same files - it means NFS is mounted correctly. You can try to create a new file touch test.txt from one server and check if the same file is accessible from other Web Servers.
 
+![web interact](<images/web interacting.jpg>)
+
 ### 7. Locate the log folder for Apache on the Web Server and mount it to NFS server's export for logs. 
 
 Repeat step No4 to make sure the mount point will persist after reboot.
 
+![logs folder mount](<images/logs mount.jpg>)
+
+![fstab2](images/fstab2.jpg)
+
 ### 8. Fork the tooling source code from ***Darey.io*** Github Account to your Github account. 
+
+```
+sudo yum install git
+```
+```
+git clone https://github.com/darey-io/tooling.git
+```
+![darey tooling](<images/fork darey.io repo.jpg>)
 
 ### 9. Deploy the tooling website's code to the Webserver. Ensure that the html folder from the repository is deployed to */var/www/html*
 
+```
+sudo cp -R html/. /var/www/html
+```
+```
+ls /var/www/html
+```
+
+![deploy](images/deploy.jpg)
+
 > Note 1: Do not forget to open TCP port 80 on the Web Server.
 
-> Note 2: If you encounter 403 Error-check permissions to your */var/www/html* folder and also disable SELinux *sudo setenforce ®* To make this change permanent - open following config file ```sudo vi /etc/sysconfig/selinux``` and set ```SELINUX-disabled```, then restart httpd.
+![port 80 open](<images/port 80.jpg>)
+
+> Note 2: If you encounter 403 Error-check permissions to your */var/www/html* folder and also disable SELinux *sudo setenforce ®* 
+
+To make this change permanent - open following config file 
+
+```
+sudo setenforce 0
+```
+
+```
+sudo vi /etc/sysconfig/selinux
+``` 
+
+and set 
+
+```
+SELINUX-disabled
+```
+![disabled](<images/selinux disabled.jpg>)
+
+then restart httpd.
+
+![httpd status](images/status.jpg)
 
 ### 10. Update the website's configuration to connect to the database (in ```/var/www/html/functions.php``` file).
 
+```
+sudo vi /var/www/html/functions.php
+```
+![function.php](<images/function php.jpg>)
+
+
  Apply ```tooling-db.sql``` script to your database using this command ```mysql -h <databse-private-ip> -u <db-username> -p <db-pasword> < tooling-db.sql```
+
+```
+sudo yum install mysql
+```
+
+ ```
+ tooling-db.sql
+ ```
+ ```
+ mysql -h <databse-private-ip> -u <db-username> -p <db-pasword> < tooling-db.sql
+ ```
+
+ ```
+ mysql -h 172.31.31.166 -u webaccess -p tooling < tooling-db.sql
+ ```
+![mysql port](<images/port for mysql.jpg>)
+
 
 ### 11. Create in MySQL a new admin user with username: ```myuser``` and password: ```password:```
 
@@ -444,9 +543,17 @@ INSERT INTO 'users' ('id', 'username', 'password', 'email', 'user_type', 'status
 -> (1, 'myuser', '5f4dcc3b5aa765d61d8327deb882cf99', 'user@mail.com', 'admin', '1');
 ```
 
-### 12. Open the website in your browser ```http://<Web-Server-Public-IP-Address-or-Public-DNS-Name>/index.php``` 
+### 12. Open the website in your browser 
 
-and make sure you can login into the websute with ```myuser``` user.
+```
+http://<Web-Server-Public-IP-Address-or-Public-DNS-Name>/index.php
+``` 
+
+```
+http://18.153.68.12/index.php
+```
+
+and make sure you can login into the website with ```myuser``` user.
 
 
 ### We have just implemented a web solution for a DevOps team using LAMP stack with remote Database and NFS servers.
