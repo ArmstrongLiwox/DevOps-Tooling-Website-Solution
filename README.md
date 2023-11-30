@@ -353,6 +353,19 @@ exit;
 
 ![tooling database](<images/tooling database.jpg>)
 
+```
+sudo vi /etc/mysql/mysql.conf.d/mysqld.cnf
+```
+![binding address](<images/binding address.jpg>)
+
+```
+sudo systemctl restart mysql
+```
+
+```
+sudo systemctl status mysql
+```
+![mysql running](<images/mysql running.jpg>)
 
 ### Step 3 Prepare the Web Servers
 
