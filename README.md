@@ -147,9 +147,7 @@ RHEL-8.6.0_HVM-20220503-x86_64-2-Hourly2-GP2 (ami-035c5dc086849b5de)
 
 > 1. Spin up a new EC2 instance with RHEL Linux 8 Operating System.
 
-![ec2 nfs](<images/spinup ec2.jpg>)
-
-![instances](images/instances.jpg)
+![instances1](images/Screenshot_1.jpg)
 
 ![volumes](images/volumes.jpg)
 
