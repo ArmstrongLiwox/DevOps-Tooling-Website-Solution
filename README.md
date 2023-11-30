@@ -147,14 +147,82 @@ RHEL-8.6.0_HVM-20220503-x86_64-2-Hourly2-GP2 (ami-035c5dc086849b5de)
 
 > 1. Spin up a new EC2 instance with RHEL Linux 8 Operating System.
 
+![ec2 nfs](<images/spinup ec2.jpg>)
+
+![instances](images/instances.jpg)
+
+![volumes](images/volumes.jpg)
+
+![volume attached](<images/v attached.jpg>)
+
 > 2. Based on your LVM experience from Project 6, Configure LVM on the Server.
+
+![connect](images/connect.jpg)
+
+![disk](images/disk.jpg)
 
 • Instead of formating the disks as ext4 you will have to format them as xfs
 • Ensure there are 3 Logical Volumes. 1v-opt lv-apps, and lv-logs
 
-> 3. Create mount points on /mnt directory for the logical volumes as follow: Mount lv-apps on /mnt/apps
+![devices](images/devices.jpg)
 
-- To be used by webservers Mount lv-logs on /mnt/logs - To be used by webserver logs Mount Iv-opt on /mnt/opt - To be used by Jenkins server in Project 8
+![partitions](images/partitions.jpg)
+
+![lvm install](<images/lvm install.jpg>)
+
+![pvcreare](images/pvcreate.jpg)
+
+![vgs](images/vgs.jpg)
+
+![lvs](images/lvs.jpg)
+
+```
+sudo mkfs -t xfs /dev/webdata-vg/lv-opt
+```
+```
+sudo mkfs -t xfs /dev/webdata-vg/lv-apps
+```
+```
+sudo mkfs -t xfs /dev/webdata-vg/lv-logs
+```
+
+![mkfs xfs](images/mkfs.jpg)
+
+> 3. Create mount points on /mnt directory for the logical volumes as follow: 
+
+```
+sudo mkdir /mnt/apps
+```
+```
+sudo mkdir /mnt/logs
+```
+```
+sudo mkdir /mnt/opt
+```
+
+Mount lv-apps on /mnt/apps
+
+- To be used by webservers 
+
+Mount lv-logs on /mnt/logs
+
+- To be used by webserver logs 
+
+Mount Iv-opt on /mnt/opt 
+
+- To be used by Jenkins server in Project 8
+
+
+```
+sudo mount /dev/webdata-vg/lv-apps /mnt/apps
+```
+```
+sudo mount /dev/webdata-vg/lv-logs /mnt/logs
+```
+```
+sudo mount /dev/webdata-vg/lv-opt /mnt/opt
+```
+![mounts](images/mounts.jpg)
 
 > 4. Install NFS server, configure it to start on reboot and make sure it is u and running.
 
@@ -173,6 +241,7 @@ sudo systemctl enable nfs-server.service
 ```
 sudo systemctl status nfs-server.service
 ```
+![nfs running](<images/nfs running.jpg>)
 
 
 > 5. Export the mounts for webservers' subnet cidr to connect as clients. 
@@ -240,6 +309,36 @@ By now you should know how to install and configure a MySQL DBMS to work with re
 2. Create a database and name it *tooling*
 3. Create a database user and name it *webaccess*
 4. Grant permission to *webaccess* user on *tooling* database to do anything only from the webservers *subnet cidr*
+
+```
+sudo apt update
+```
+```
+sudo apt install mysql-server -y
+```
+```
+sudo mysql
+```
+
+```
+create database tooling;
+create user 'webaccess'@'172.31.16.0/20' identified by 'password';
+grant all privileges on tolling.* to 'webaccess'@'172.31.16.0/20';
+flush privileges;
+show databases;
+exit;
+```
+
+![db connect](<images/db connect.jpg>)
+
+![mysql install](<images/mysql install.jpg>)
+
+![web1](images/web1.jpg)
+
+![subnet1](images/subnet1.jpg)
+
+![tooling database](<images/tooling database.jpg>)
+
 
 ### Step 3 Prepare the Web Servers
 
