@@ -555,9 +555,6 @@ sudo yum install mysql
  ```
  mysql -h <databse-private-ip> -u <db-username> -p <db-pasword> < tooling-db.sql
  ```
-```
-mysql -h 172.31.31.166 -u access -p password < tooling-db.sql
-```
  ```
  mysql -h 172.31.31.166 -u webaccess -p tooling < tooling-db.sql
  ```
