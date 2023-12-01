@@ -407,6 +407,11 @@ sudo mkdir /var/www
 ```
 sudo mount -t nfs -o rw,nosuid <NFS-Server-Private-IP-Address>:/mnt/apps /var/www
 ```
+```
+sudo mount -t nfs -o rw,nosuid 172.31.16.77:/mnt/apps /var/www
+```
+
+
 ![mount web1](<images/mount web1.jpg>)
 
 ### 4. Verify that NFS was mounted successfully by running of -h . Make sure that the changes will persist on Web Server after reboot:
@@ -522,6 +527,14 @@ then restart httpd.
 
 ![httpd status](images/status.jpg)
 
+> change binding address to 0.0.0.0
+
+```
+sudo vi /etc/mysql/mysql.conf.d/mysqld.cnf
+```
+
+![binding](images/binding.jpg)
+
 ### 10. Update the website's configuration to connect to the database (in ```/var/www/html/functions.php``` file).
 
 ```
@@ -550,6 +563,7 @@ mysql -h 172.31.31.166 -u access -p password < tooling-db.sql
  ```
 ![mysql port](<images/port for mysql.jpg>)
 
+> encountered MySQL Error 1045 : https://kinsta.com/knowledgebase/mysql-error-1045/#:~:text=Fortunately%2C%20there%20are%20ways%20you,listening%20to%20the%20right%20port.
 
 ### 11. Create in MySQL a new admin user with username: ```myuser``` and password: ```password:```
 
