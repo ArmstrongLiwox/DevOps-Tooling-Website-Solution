@@ -584,6 +584,13 @@ http://18.153.68.12/index.php
 
 and make sure you can login into the website with ```myuser``` user.
 
+> the expected outcome is as shown below
+
+![expected outcome 1](<images/expected outcome 2.jpg>)
+
+![expected outcome 2](<images/expected outcome.jpg>)
+
+![expected outcome 3](<images/expected outcome 1.jpg>)
 
 ### We have just implemented a web solution for a DevOps team using LAMP stack with remote Database and NFS servers.
 
