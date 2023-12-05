@@ -583,7 +583,7 @@ and make sure you can login into the website with ```myuser``` user.
 
 > the expected outcome is as shown below
 
-![expected outcome 1](<images/expected outcome 2.jpg>)
+[expected outcome 1](<images/expected outcome 2.jpg>)
 
 ![expected outcome 2](<images/expected outcome.jpg>)
 
